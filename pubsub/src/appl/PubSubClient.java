@@ -141,6 +141,7 @@ public class PubSubClient {
             Message response = publisher.sendReceive(msgPub);
 
             if (response != null) {
+                System.out.println("Response different null");
                 if(response.getType().equals("backup")){
                     primaryAddress = response.getContent().split(":")[0];
                     primaryPort = Integer.parseInt(response.getContent().split(":")[1]);

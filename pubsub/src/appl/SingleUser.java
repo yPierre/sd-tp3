@@ -39,7 +39,7 @@ public class SingleUser {
         PubSubClient user = new PubSubClient("localhost", userPort);
 
         user.subscribe("localhost", brokerPort);
-        user.subscribe("localhost", 8081);
+        //user.subscribe("localhost", 8081);
 
         startTP2(user, userName, brokerPort, "localhost");
     }

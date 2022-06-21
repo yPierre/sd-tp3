@@ -49,15 +49,28 @@ public class PubCommand implements PubSubCommand {
 
 
         CopyOnWriteArrayList<String> subscribersCopy = new CopyOnWriteArrayList<String>();
+
+        int sup, i = 0;
+        System.out.println("SecondaryServerPort: " + secondaryServerPort);
+        if(secondaryServerPort <= 0) {
+            System.out.println("Pub primary broker, no backup");
+            sup = subscribers.size();
+        }
+        else {
+            System.out.println("Pub primary broker, divide task");
+            sup = subscribers.size() / 2;
+        }
         subscribersCopy.addAll(subscribers);
         for (String aux : subscribersCopy) {
-            String[] ipAndPort = aux.split(":");
-            Client client = new Client(ipAndPort[0], Integer.parseInt(ipAndPort[1]));
-            msg.setBrokerId(m.getBrokerId());
-            Message cMsg = client.sendReceive(msg);
-            if (cMsg == null) {
-                System.out.println("Notify of publish service is not proceed... " + msg.getContent());
-                subscribers.remove(aux);
+            if(i < sup) {
+                String[] ipAndPort = aux.split(":");
+                Client client = new Client(ipAndPort[0], Integer.parseInt(ipAndPort[1]));
+                msg.setBrokerId(m.getBrokerId());
+                Message cMsg = client.sendReceive(msg);
+                if (cMsg == null) {
+                    System.out.println("Notify of publish service is not proceed... " + msg.getContent());
+                    subscribers.remove(aux);
+                }
             }
         }
 

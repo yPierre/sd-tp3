@@ -53,22 +53,22 @@ public class SubCommand implements PubSubCommand {
             //start many clients to send all existing log messages
             //for the subscribed user
             if (!log.isEmpty()) {
-                /* Codigo referente a tarefa de dividir o trabalho entre os brokers
+                // Codigo referente a tarefa de dividir o trabalho entre os brokers
                 int inf, sup;
-                if(isPrimary) {
-                    System.out.println("Primeiro trabalhou");
+                if(secondaryServerPort <= 0) {
+                    System.out.println("Sub primary broker, no backup");
+                    inf = 0;
+                    sup = log.size();
+                }
+                else {
+                    System.out.println("Sub primary broker, divide task");
                     inf = 0;
                     sup = log.size() / 2;
                 }
-                else {
-                    System.out.println("Backup trabalho!");
-                    inf = log.size() / 2;
-                    sup = log.size();
-                }
-                */
+
                 Iterator<Message> it = log.iterator();
                 String[] ipAndPort = m.getContent().split(":");
-                while (it.hasNext()){// && inf < sup) {
+                while (it.hasNext() && inf < sup) {
                     Client client = new Client(ipAndPort[0], Integer.parseInt(ipAndPort[1]));
                     Message msg = it.next();
                     Message aux = new MessageImpl();
@@ -81,7 +81,7 @@ public class SubCommand implements PubSubCommand {
                         subscribers.remove(m.getContent());
                         break;
                     }
-                    //inf++;
+                    inf++;
                 }
             }
 

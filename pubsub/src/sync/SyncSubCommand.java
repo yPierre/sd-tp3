@@ -1,11 +1,13 @@
 package sync;
 
+import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 
 import core.Message;
 import core.MessageImpl;
 import core.PubSubCommand;
+import core.client.Client;
 
 public class SyncSubCommand implements PubSubCommand {
 
@@ -25,6 +27,30 @@ public class SyncSubCommand implements PubSubCommand {
 
 
             response.setContent("Subscriber added into backup: " + m.getContent());
+
+            if (!log.isEmpty()) {
+                // Codigo referente a tarefa de dividir o trabalho entre os brokers
+                int inf = log.size() / 2, sup = log.size();
+                System.out.println("--Sub Backup broker");
+
+                Iterator<Message> it = log.iterator();
+                String[] ipAndPort = m.getContent().split(":");
+                while (it.hasNext() && inf < sup) {
+                    Client client = new Client(ipAndPort[0], Integer.parseInt(ipAndPort[1]));
+                    Message msg = it.next();
+                    Message aux = new MessageImpl();
+                    aux.setType("notify");
+                    aux.setContent(msg.getContent());
+                    aux.setLogId(msg.getLogId());
+                    aux.setBrokerId(m.getBrokerId());
+                    Message cMsg = client.sendReceive(aux);
+                    if (cMsg == null) {
+                        subscribers.remove(m.getContent());
+                        break;
+                    }
+                    inf++;
+                }
+            }
 
         }
 
