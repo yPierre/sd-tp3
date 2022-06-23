@@ -13,6 +13,7 @@ public class OneAppl {
     }
 
     public OneAppl(boolean flag) {
+        /*
         PubSubClient joubert = new PubSubClient("localhost", 8083);
         PubSubClient debora = new PubSubClient("localhost", 8084);
         PubSubClient jonata = new PubSubClient("localhost", 8085);
@@ -74,6 +75,7 @@ public class OneAppl {
         joubert.stopPubSubClient();
         debora.stopPubSubClient();
         jonata.stopPubSubClient();
+        */
     }
 
     public static void main(String[] args) {

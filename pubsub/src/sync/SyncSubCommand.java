@@ -14,6 +14,7 @@ public class SyncSubCommand implements PubSubCommand {
     @Override
     public Message execute(Message m, SortedSet<Message> log, Set<String> subscribers, boolean isPrimary,
                            String sencondaryServerAddress, int secondaryServerPort) {
+
         Message response = new MessageImpl();
 
         if (subscribers.contains(m.getContent()))
@@ -30,25 +31,27 @@ public class SyncSubCommand implements PubSubCommand {
 
             if (!log.isEmpty()) {
                 // Codigo referente a tarefa de dividir o trabalho entre os brokers
-                int inf = log.size() / 2, sup = log.size();
-                System.out.println("--Sub Backup broker");
+                int inf = log.size() / 2, i = 0;
+                System.out.println("--Backup Broker sending some messages to the new sub");
 
                 Iterator<Message> it = log.iterator();
                 String[] ipAndPort = m.getContent().split(":");
-                while (it.hasNext() && inf < sup) {
-                    Client client = new Client(ipAndPort[0], Integer.parseInt(ipAndPort[1]));
-                    Message msg = it.next();
-                    Message aux = new MessageImpl();
-                    aux.setType("notify");
-                    aux.setContent(msg.getContent());
-                    aux.setLogId(msg.getLogId());
-                    aux.setBrokerId(m.getBrokerId());
-                    Message cMsg = client.sendReceive(aux);
-                    if (cMsg == null) {
-                        subscribers.remove(m.getContent());
-                        break;
+                while (it.hasNext()) {
+                    if(i >= inf) {
+                        Client client = new Client(ipAndPort[0], Integer.parseInt(ipAndPort[1]));
+                        Message msg = it.next();
+                        Message aux = new MessageImpl();
+                        aux.setType("notify");
+                        aux.setContent(msg.getContent());
+                        aux.setLogId(msg.getLogId());
+                        aux.setBrokerId(m.getBrokerId());
+                        Message cMsg = client.sendReceive(aux);
+                        if (cMsg == null) {
+                            subscribers.remove(m.getContent());
+                            break;
+                        }
                     }
-                    inf++;
+                    i++;
                 }
             }
 

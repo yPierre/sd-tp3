@@ -37,7 +37,7 @@ public class SubCommand implements PubSubCommand {
 
                     Client clientBackup = new Client(sencondaryServerAddress, secondaryServerPort);
                     syncSubMsg = clientBackup.sendReceive(syncSubMsg);
-                    System.out.println(syncSubMsg.getContent());
+                    //System.out.println(syncSubMsg.getContent());
 
                 } catch (Exception e) {
                     System.out.println("Cannot sync with backup - subscribe service");
@@ -55,13 +55,13 @@ public class SubCommand implements PubSubCommand {
             if (!log.isEmpty()) {
                 // Codigo referente a tarefa de dividir o trabalho entre os brokers
                 int inf, sup;
-                if(secondaryServerPort <= 0) {
-                    System.out.println("Sub primary broker, no backup");
+                if(secondaryServerPort <= 0 && sencondaryServerAddress == null) {
+                    System.out.println("--Primary Broker only sending messages to the new sub");
                     inf = 0;
                     sup = log.size();
                 }
                 else {
-                    System.out.println("Sub primary broker, divide task");
+                    System.out.println("--Primary Broker sending some messages to the new sub");
                     inf = 0;
                     sup = log.size() / 2;
                 }

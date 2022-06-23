@@ -16,9 +16,19 @@ public class SingleUser {
         Scanner reader = new Scanner(System.in);  // Reading from System.in
         System.out.print("Enter the Broker port number: ");
         int brokerPort = reader.nextInt();
+        //int brokerPort = 8080;
 
-        //System.out.print("Enter the Broker address: ");
-        //String brokerAdd = reader.next();
+        System.out.print("Enter the Broker address: ");
+        String brokerAdd = reader.next();
+        //String brokerAdd = "localhost";
+
+        System.out.print("Enter the Broker backup port number: ");
+        int brokerBackupPort = reader.nextInt();
+        //int brokerBackupPort = 8081;
+
+        System.out.print("Enter the Broker backup address: ");
+        String brokerBackupAdd = reader.next();
+        //String brokerBackupAdd = "localhost";
 
         System.out.print("Enter the User name: ");
         String userName = reader.next();
@@ -26,8 +36,9 @@ public class SingleUser {
         System.out.print("Enter the User port number: ");
         int userPort = reader.nextInt();
 
-        //System.out.print("Enter the User address: ");
-        //String userAdd = reader.next();
+        System.out.print("Enter the User address: ");
+        String userAdd = reader.next();
+        //String userAdd = "localhost";
 
         try {
             Thread.sleep(5000);
@@ -36,12 +47,12 @@ public class SingleUser {
             e.printStackTrace();
         }
 
-        PubSubClient user = new PubSubClient("localhost", userPort);
+        PubSubClient user = new PubSubClient(userAdd, userPort);
 
-        user.subscribe("localhost", brokerPort);
+        user.subscribe(brokerAdd, brokerPort, brokerBackupAdd, brokerBackupPort);
         //user.subscribe("localhost", 8081);
 
-        startTP2(user, userName, brokerPort, "localhost");
+        startTP2(user, userName, brokerPort, brokerAdd);
     }
 
     //Protocolo
@@ -128,7 +139,7 @@ public class SingleUser {
 
             System.out.println("The resource " + "*" + " is available for you.");
             try {
-                int wait = (int) ((Math.random() * (5000 - 1000)) + 1000);
+                int wait = (int) ((Math.random() * (5000 - 1000)) + 3000);
                 Thread.sleep(wait);
                 System.out.println("The resource " + "*" + " was used for " + wait / 1000 + " seconds.");
             } catch (InterruptedException e1) {
@@ -173,7 +184,10 @@ public class SingleUser {
             }
         }
         usuarios.remove(userName); //remove o nome do usu�rio que esta realizando o access naquele momento
-        usuarios.remove("localhost");
+
+        //usuarios.remove("35.199.69.5");
+        //usuarios.remove("34.95.192.199");
+
 
         return usuarios;
     }

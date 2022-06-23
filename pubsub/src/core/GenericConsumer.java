@@ -22,7 +22,7 @@ public abstract class GenericConsumer<S> extends Thread {
     protected void loadCommandProperties() {
         Properties properties = new Properties();
         try {
-            properties.load(new FileInputStream("config.properties"));
+            properties.load(new FileInputStream("C:\\Users\\jean_\\IdeaProjects\\tp3\\config.properties"));
             Set<String> ids = properties.stringPropertyNames();
             for (String aux : ids) {
                 @SuppressWarnings("rawtypes")

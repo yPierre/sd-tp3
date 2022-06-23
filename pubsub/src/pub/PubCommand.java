@@ -20,7 +20,6 @@ public class PubCommand implements PubSubCommand {
 
         response.setLogId(logId);
         m.setLogId(logId);
-
         if (sencondaryServerAddress != null && secondaryServerPort > 0) {
             try {
                 //sincronizar com o broker backup
@@ -51,13 +50,13 @@ public class PubCommand implements PubSubCommand {
         CopyOnWriteArrayList<String> subscribersCopy = new CopyOnWriteArrayList<String>();
 
         int sup, i = 0;
-        System.out.println("SecondaryServerPort: " + secondaryServerPort);
-        if(secondaryServerPort <= 0) {
-            System.out.println("Pub primary broker, no backup");
+        //System.out.println("SecondaryServerPort: " + secondaryServerPort);
+        if(secondaryServerPort <= 0 && sencondaryServerAddress == null) {
+            System.out.println("-Primary Broker sending one message to ALL subs");
             sup = subscribers.size();
         }
         else {
-            System.out.println("Pub primary broker, divide task");
+            System.out.println("-Primary Broker sending one message to SOME subs");
             sup = subscribers.size() / 2;
         }
         subscribersCopy.addAll(subscribers);
@@ -72,6 +71,7 @@ public class PubCommand implements PubSubCommand {
                     subscribers.remove(aux);
                 }
             }
+            i++;
         }
 
         response.setContent("Message published: " + m.getContent());

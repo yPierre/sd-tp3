@@ -46,8 +46,6 @@ public class PubSubConsumer<S extends Socket> extends GenericConsumer<S> {
 
             if(msg.getType().startsWith("syncNewPrimary")){
                 if(!isPrimary) {
-                    //System.out.println("Entrou syncNewPrimary");
-                    //System.out.println(isPrimary + " - " + secondaryServer + " - " + secondaryPort);
                     response = commands.get(msg.getType()).execute(msg, log, subscribers, isPrimary, secondaryServer, secondaryPort);
                     this.isPrimary = true;
                     this.secondaryServer = null;
@@ -58,11 +56,10 @@ public class PubSubConsumer<S extends Socket> extends GenericConsumer<S> {
                 response = new MessageImpl();
                 response.setType("backup");
                 response.setContent(secondaryServer + ":" + secondaryPort);
-                System.out.println("O broker backup repassou ao broker primario");
 
-            } else {
+            }
+            else {
                 if (!msg.getType().equals("notify") && !msg.getType().startsWith("sync")) {
-                    //System.out.println("Ha um broker primario aqui");
                     msg.setLogId(uniqueLogId);
                 }
 

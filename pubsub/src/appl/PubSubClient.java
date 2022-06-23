@@ -34,14 +34,14 @@ public class PubSubClient {
         this.clientPort = clientPort;
         observer = new Server(clientPort);
         clientThread = new ThreadWrapper(observer);
-        this.primaryAddress = "localhost";
-        this.primaryPort = 8080;
-        this.backupAddress = "localhost";
-        this.backupPort = 8081;
+        this.primaryAddress = null;
+        this.primaryPort = 0;
+        this.backupAddress = null;
+        this.backupPort = 0;
         clientThread.start();
     }
 
-    public void subscribe(String brokerAddress, int brokerPort) {
+    public void subscribe(String brokerAddress, int brokerPort, String brokerBackupAddress, int brokerBackupPort) {
         try {
             Message msgBroker = new MessageImpl();
             msgBroker.setBrokerId(brokerPort);
@@ -55,8 +55,10 @@ public class PubSubClient {
                 subscriber = new Client(brokerAddress, brokerPort);
                 subscriber.sendReceive(msgBroker);
             }
-            primaryPort = brokerPort;
             primaryAddress = brokerAddress;
+            primaryPort = brokerPort;
+            backupAddress = brokerBackupAddress;
+            backupPort = brokerBackupPort;
         } catch (Exception e){
             Message msgBroker = new MessageImpl();
             msgBroker.setBrokerId(brokerPort);
@@ -66,10 +68,10 @@ public class PubSubClient {
             Client clienteBackup = new Client(backupAddress, backupPort);
             clienteBackup.sendReceive(msgBroker);
 
-            primaryPort = backupPort;
             primaryAddress = backupAddress;
-            backupPort = -1;
+            primaryPort = backupPort;
             backupAddress = null;
+            backupPort = -1;
 
             msgBroker = new MessageImpl();
             msgBroker.setBrokerId(backupPort);
@@ -123,7 +125,7 @@ public class PubSubClient {
         } catch (Exception e){
             Message msgBroker = new MessageImpl();
             msgBroker.setBrokerId(primaryPort);
-            msgBroker.setContent("Backup se torna primario: " + backupAddress + ":" + backupPort);
+            msgBroker.setContent("Backup promote to primary broker: " + backupAddress + ":" + backupPort);
             msgBroker.setType("syncNewPrimary");
 
             Client clientBackup = new Client(backupAddress, backupPort);
@@ -141,7 +143,6 @@ public class PubSubClient {
             Message response = publisher.sendReceive(msgPub);
 
             if (response != null) {
-                System.out.println("Response different null");
                 if(response.getType().equals("backup")){
                     primaryAddress = response.getContent().split(":")[0];
                     primaryPort = Integer.parseInt(response.getContent().split(":")[1]);
@@ -180,7 +181,7 @@ public class PubSubClient {
         clientThread = new ThreadWrapper(observer);
         clientThread.start();
 
-        subscribe(brokerAddress, brokerPort);
+        subscribe(brokerAddress, brokerPort, backupAddress, backupPort);
 
         System.out.println("Do you want to subscribe for more brokers? (Y|N)");
         String resp = reader.next();
@@ -194,7 +195,7 @@ public class PubSubClient {
                 brokerAddress = reader.next();
                 System.out.print("Enter the broker port (ex.8080): ");
                 brokerPort = reader.nextInt();
-                subscribe(brokerAddress, brokerPort);
+                subscribe(brokerAddress, brokerPort, backupAddress, backupPort);
                 System.out.println(" Write exit to finish...");
                 message = reader.next();
             }

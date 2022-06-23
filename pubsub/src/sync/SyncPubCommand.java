@@ -31,8 +31,9 @@ public class SyncPubCommand implements PubSubCommand {
 
         CopyOnWriteArrayList<String> subscribersCopy = new CopyOnWriteArrayList<String>();
 
+        System.out.println("-Backup Broker sending one message to SOME subs");
+
         int inf = subscribers.size() / 2, sup = subscribers.size(), i = 0;
-        System.out.println("Pub Backup broker");
         subscribersCopy.addAll(subscribers);
         for (String aux : subscribersCopy) {
             if(i >= inf && i < sup) {
@@ -45,6 +46,7 @@ public class SyncPubCommand implements PubSubCommand {
                     subscribers.remove(aux);
                 }
             }
+            i++;
         }
 
         response.setContent("Message published on backup: " + m.getContent());

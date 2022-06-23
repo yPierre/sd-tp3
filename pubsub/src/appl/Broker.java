@@ -16,8 +16,8 @@ public class Broker {
         System.out.print("Is the broker primary?: Y/N");
         String respYN = reader.next();
 
-        //System.out.print("Enter the secondary Broker address: ");
-        //String secondAddress = reader.next();
+        System.out.print("Enter the secondary Broker address: ");
+        String secondAddress = reader.next();
 
         System.out.print("Enter the secondary Broker port number: ");
         int secondPort = reader.nextInt();
@@ -26,7 +26,7 @@ public class Broker {
         if (respYN.equalsIgnoreCase("Y")) respBol = true;
         else respBol = false;
 
-        Server s = new Server(port, respBol, "localhost", secondPort);
+        Server s = new Server(port, respBol, secondAddress, secondPort);
 
         ThreadWrapper brokerThread = new ThreadWrapper(s);
         brokerThread.start();
